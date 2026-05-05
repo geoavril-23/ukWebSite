@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
         {
-            "src": "ukWebSite/wsgi.py",
+            "src": "ericAwesso/wsgi.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "ukWebSite/wsgi.py"
+            "dest": "ericAwesso/wsgi.py"
         }
     ]
 }
