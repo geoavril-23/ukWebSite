@@ -1,0 +1,950 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des utilisateurs — AAPSE-UK{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== CARTE CRÉATION COMPTE ===== */
+    .create-user-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(78, 115, 223, 0.13);
+        overflow: hidden;
+    }
+    .create-user-card .card-header {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        padding: 1.25rem 1.5rem;
+        border: none;
+    }
+    .create-user-card .card-header h5 {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin: 0;
+        letter-spacing: 0.3px;
+    }
+    .create-user-card .card-body {
+        padding: 2rem;
+        background: #fff;
+    }
+
+    /* ===== CHAMPS FORMULAIRE ===== */
+    .form-label-custom {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #5a5c69;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.35rem;
+    }
+    .form-control-custom {
+        border: 1.5px solid #d1d3e2;
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.92rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #f8f9fc;
+    }
+    .form-control-custom:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+        background: #fff;
+        outline: none;
+    }
+    .input-icon-wrapper {
+        position: relative;
+    }
+    .input-icon-wrapper .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b7b9cc;
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+    .input-icon-wrapper .form-control-custom {
+        padding-left: 2.2rem;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #b7b9cc;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+    }
+    .toggle-password:hover { color: #4e73df; }
+
+    /* ===== SÉLECTEUR DE RÔLE ===== */
+    .role-selector {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.25rem;
+    }
+    .role-option {
+        flex: 1;
+        position: relative;
+    }
+    .role-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .role-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.1rem 0.75rem;
+        border: 2px solid #d1d3e2;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.22s ease;
+        background: #f8f9fc;
+        text-align: center;
+        user-select: none;
+    }
+    .role-card:hover {
+        border-color: #4e73df;
+        background: #eef0fb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(78,115,223,0.12);
+    }
+    .role-option input[type="radio"]:checked + .role-card {
+        border-color: #4e73df;
+        background: linear-gradient(135deg, #eef0fb 0%, #dde3f8 100%);
+        box-shadow: 0 4px 16px rgba(78,115,223,0.2);
+    }
+    .role-option input[type="radio"]:checked + .role-card .role-icon {
+        color: #4e73df;
+    }
+    .role-option input[type="radio"]:checked + .role-card .role-name {
+        color: #224abe;
+        font-weight: 700;
+    }
+    /* Rôle Manager — couleur verte */
+    .role-option.manager-opt input[type="radio"]:checked + .role-card {
+        border-color: #1cc88a;
+        background: linear-gradient(135deg, #eafaf4 0%, #c3f0e0 100%);
+        box-shadow: 0 4px 16px rgba(28,200,138,0.18);
+    }
+    .role-option.manager-opt input[type="radio"]:checked + .role-card .role-icon {
+        color: #1cc88a;
+    }
+    .role-option.manager-opt input[type="radio"]:checked + .role-card .role-name {
+        color: #13855c;
+    }
+    .role-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.4rem;
+        color: #b7b9cc;
+        transition: color 0.22s;
+    }
+    .role-name {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #5a5c69;
+        transition: color 0.22s;
+    }
+    .role-desc {
+        font-size: 0.72rem;
+        color: #858796;
+        margin-top: 0.2rem;
+        line-height: 1.3;
+    }
+
+    /* ===== INDICATEUR FORCE MOT DE PASSE ===== */
+    .password-strength-bar {
+        height: 5px;
+        border-radius: 3px;
+        background: #e3e6f0;
+        margin-top: 6px;
+        overflow: hidden;
+    }
+    .password-strength-fill {
+        height: 100%;
+        border-radius: 3px;
+        width: 0%;
+        transition: width 0.3s, background 0.3s;
+    }
+    .strength-text {
+        font-size: 0.75rem;
+        margin-top: 3px;
+        font-weight: 600;
+    }
+
+    /* ===== BOUTON CRÉER ===== */
+    .btn-create-user {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.7rem 2rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.3px;
+        transition: all 0.22s;
+        box-shadow: 0 4px 12px rgba(78,115,223,0.3);
+    }
+    .btn-create-user:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(78,115,223,0.4);
+        color: #fff;
+    }
+    .btn-create-user:active { transform: translateY(0); }
+
+    /* ===== SÉPARATEUR SECTION ===== */
+    .section-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 2rem 0 1.5rem;
+    }
+    .section-divider hr {
+        flex: 1;
+        border-color: #e3e6f0;
+        margin: 0;
+    }
+    .section-divider span {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #b7b9cc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        white-space: nowrap;
+    }
+
+    /* ===== TABLEAU UTILISATEURS ===== */
+    .users-table-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+    .users-table-card .card-header {
+        background: #fff;
+        border-bottom: 2px solid #e3e6f0;
+        padding: 1.1rem 1.5rem;
+    }
+    .users-table-card .card-header h6 {
+        font-weight: 700;
+        color: #5a5c69;
+        margin: 0;
+    }
+    .table thead th {
+        background: #f8f9fc;
+        border-bottom: 2px solid #e3e6f0;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #858796;
+        padding: 0.85rem 1rem;
+    }
+    .table tbody td {
+        vertical-align: middle;
+        padding: 0.85rem 1rem;
+        font-size: 0.9rem;
+        color: #5a5c69;
+        border-bottom: 1px solid #f0f0f5;
+    }
+    .table tbody tr:hover { background: #f8f9fc; }
+    .user-avatar-sm {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+    .badge-role-manager {
+        background: linear-gradient(135deg, #1cc88a, #13855c);
+        color: #fff;
+        padding: 0.3em 0.75em;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-role-visiteur {
+        background: linear-gradient(135deg, #36b9cc, #258391);
+        color: #fff;
+        padding: 0.3em 0.75em;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-superuser {
+        background: linear-gradient(135deg, #e74a3b, #be2617);
+        color: #fff;
+        padding: 0.3em 0.75em;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* ===== MODAL EDIT ===== */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+        background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+        border-radius: 16px 16px 0 0;
+        border: none;
+        padding: 1.2rem 1.5rem;
+    }
+    .modal-header .modal-title { color: #fff; font-weight: 700; }
+    .modal-header .close { color: #fff; opacity: 0.8; }
+
+    /* ===== ALERTES ===== */
+    .alert { border-radius: 10px; border: none; font-size: 0.9rem; }
+    .alert-success { background: #d4edda; color: #155724; }
+    .alert-danger  { background: #f8d7da; color: #721c24; }
+
+    /* ===== STATS MINI ===== */
+    .stat-mini {
+        background: #f8f9fc;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        border: 1.5px solid #e3e6f0;
+    }
+    .stat-mini .stat-num {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #4e73df;
+        line-height: 1;
+    }
+    .stat-mini .stat-label {
+        font-size: 0.72rem;
+        color: #858796;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 3px;
+    }
+    .stat-mini.green .stat-num { color: #1cc88a; }
+    .stat-mini.cyan  .stat-num { color: #36b9cc; }
+    .stat-mini.red   .stat-num { color: #e74a3b; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== EN-TÊTE PAGE ===== -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 text-gray-800 font-weight-bold">
+            <i class="fas fa-users-cog text-primary mr-2"></i>Gestion des utilisateurs
+        </h1>
+        <p class="text-muted mb-0" style="font-size:0.88rem;">
+            Créez des comptes, assignez des rôles et gérez les accès à la plateforme.
+        </p>
+    </div>
+    <div class="d-flex gap-2 mt-2 mt-sm-0">
+        <span class="badge badge-pill badge-primary px-3 py-2" style="font-size:0.82rem;">
+            <i class="fas fa-user-shield mr-1"></i>Superadmin
+        </span>
+    </div>
+</div>
+
+<!-- ===== ALERTES DJANGO ===== -->
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<!-- ===== STATISTIQUES RAPIDES ===== -->
+<div class="row mb-4">
+    <div class="col-6 col-md-3 mb-3">
+        <div class="stat-mini">
+            <div class="stat-num">{{ users|length }}</div>
+            <div class="stat-label">Total comptes</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <div class="stat-mini green">
+            <div class="stat-num">
+                {% with managers=users|length %}
+                    {{ users|dictsort:"profile.role"|length }}
+                {% endwith %}
+            </div>
+            <div class="stat-label">Managers</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <div class="stat-mini cyan">
+            <div class="stat-num" id="statVisiteurs">—</div>
+            <div class="stat-label">Visiteurs</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <div class="stat-mini red">
+            <div class="stat-num" id="statSuperusers">—</div>
+            <div class="stat-label">Superusers</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CARTE : CRÉER UN COMPTE ===== -->
+<div class="card create-user-card mb-4">
+    <div class="card-header">
+        <h5>
+            <i class="fas fa-user-plus mr-2"></i>Créer un nouveau compte utilisateur
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{% url 'add_user' %}" id="createUserForm" novalidate>
+            {% csrf_token %}
+
+            <!-- Ligne 1 : Prénom + Nom -->
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label-custom">Prénom</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" class="form-control form-control-custom"
+                               name="prenom" id="id_prenom"
+                               placeholder="ex : Jean-Pierre"
+                               autocomplete="given-name">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom">Nom de famille</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" class="form-control form-control-custom"
+                               name="nom" id="id_nom"
+                               placeholder="ex : DUPONT"
+                               autocomplete="family-name">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ligne 2 : Nom d'utilisateur + Email -->
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label-custom">
+                        Nom d'utilisateur <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-at input-icon"></i>
+                        <input type="text" class="form-control form-control-custom"
+                               name="username" id="id_username"
+                               placeholder="ex : jean.dupont"
+                               required autocomplete="username">
+                    </div>
+                    <small class="text-muted" style="font-size:0.75rem;">
+                        Lettres, chiffres et @/./+/-/_ uniquement.
+                    </small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom">
+                        Adresse email <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" class="form-control form-control-custom"
+                               name="email" id="id_email"
+                               placeholder="ex : jean@example.com"
+                               required autocomplete="email">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ligne 3 : Mot de passe + Confirmation -->
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label-custom">
+                        Mot de passe <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" class="form-control form-control-custom"
+                               name="password" id="id_password"
+                               placeholder="Min. 8 caractères"
+                               required autocomplete="new-password">
+                        <i class="fas fa-eye toggle-password" id="togglePwd" title="Afficher/masquer"></i>
+                    </div>
+                    <!-- Barre de force -->
+                    <div class="password-strength-bar">
+                        <div class="password-strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom">
+                        Confirmer le mot de passe <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" class="form-control form-control-custom"
+                               name="password_confirm" id="id_password_confirm"
+                               placeholder="Répétez le mot de passe"
+                               required autocomplete="new-password">
+                        <i class="fas fa-eye toggle-password" id="togglePwdConfirm" title="Afficher/masquer"></i>
+                    </div>
+                    <div class="strength-text" id="matchText"></div>
+                </div>
+            </div>
+
+            <!-- Ligne 4 : Sélection du rôle -->
+            <div class="mb-4">
+                <label class="form-label-custom">
+                    Rôle du compte <span class="text-danger">*</span>
+                </label>
+                <div class="role-selector">
+
+                    <!-- Option : Visiteur -->
+                    <div class="role-option visiteur-opt">
+                        <input type="radio" name="role" id="role_visiteur" value="visiteur" checked>
+                        <label class="role-card" for="role_visiteur">
+                            <div class="role-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="role-name">Visiteur</div>
+                            <div class="role-desc">Accès lecture seule.<br>Peut soumettre des demandes.</div>
+                        </label>
+                    </div>
+
+                    <!-- Option : Manager -->
+                    <div class="role-option manager-opt">
+                        <input type="radio" name="role" id="role_manager" value="manager">
+                        <label class="role-card" for="role_manager">
+                            <div class="role-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="role-name">Manager</div>
+                            <div class="role-desc">Gère les messages<br>et les demandes.</div>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="d-flex align-items-center flex-wrap" style="gap: 1rem;">
+                <button type="submit" class="btn btn-create-user" id="submitBtn">
+                    <i class="fas fa-user-plus mr-2"></i>Créer le compte
+                </button>
+                <button type="reset" class="btn btn-outline-secondary" style="border-radius:10px; padding:0.7rem 1.5rem; font-weight:600;">
+                    <i class="fas fa-undo mr-1"></i>Réinitialiser
+                </button>
+                <small class="text-muted" style="font-size:0.78rem; margin-left: auto;">
+                    <span class="text-danger">*</span> Champs obligatoires
+                </small>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ===== CARTE : LISTE DES UTILISATEURS ===== -->
+<div class="card users-table-card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h6 class="font-weight-bold text-primary mb-0">
+            <i class="fas fa-list mr-2"></i>Liste des comptes ({{ users|length }})
+        </h6>
+        <div class="input-group" style="max-width:220px;">
+            <input type="text" class="form-control form-control-sm" id="searchUser"
+                   placeholder="Rechercher..." style="border-radius:8px 0 0 8px;">
+            <div class="input-group-append">
+                <span class="input-group-text" style="border-radius:0 8px 8px 0; background:#f8f9fc;">
+                    <i class="fas fa-search text-muted" style="font-size:0.8rem;"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0" id="userTable">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">#</th>
+                        <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th style="width:220px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr data-username="{{ u.username|lower }}" data-email="{{ u.email|lower }}">
+                        <td class="text-muted" style="font-size:0.8rem;">{{ u.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar-sm">
+                                    {{ u.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="font-weight-bold" style="font-size:0.9rem;">{{ u.username }}</div>
+                                    {% if u.first_name or u.last_name %}
+                                    <div class="text-muted" style="font-size:0.78rem;">{{ u.first_name }} {{ u.last_name }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-size:0.88rem;">{{ u.email|default:"—" }}</td>
+                        <td>
+                            {% if u.is_superuser %}
+                                <span class="badge-superuser">
+                                    <i class="fas fa-crown mr-1"></i>Superuser
+                                </span>
+                            {% elif u.profile.role == 'manager' %}
+                                <span class="badge-role-manager">
+                                    <i class="fas fa-user-tie mr-1"></i>Manager
+                                </span>
+                            {% else %}
+                                <span class="badge-role-visiteur">
+                                    <i class="fas fa-user mr-1"></i>Visiteur
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="text-success" style="font-size:0.82rem; font-weight:600;">
+                                    <i class="fas fa-circle mr-1" style="font-size:0.55rem;"></i>Actif
+                                </span>
+                            {% else %}
+                                <span class="text-danger" style="font-size:0.82rem; font-weight:600;">
+                                    <i class="fas fa-circle mr-1" style="font-size:0.55rem;"></i>Inactif
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1" style="gap:4px;">
+                                <!-- Modifier -->
+                                <button class="btn btn-warning btn-sm edit-user-btn"
+                                        data-id="{{ u.id }}"
+                                        data-username="{{ u.username }}"
+                                        data-email="{{ u.email }}"
+                                        data-prenom="{{ u.first_name }}"
+                                        data-nom="{{ u.last_name }}"
+                                        title="Modifier"
+                                        style="border-radius:6px; font-size:0.78rem; padding:0.3rem 0.6rem;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <!-- Changer rôle -->
+                                {% if not u.is_superuser %}
+                                <button class="btn btn-sm role-btn {% if u.profile.role == 'manager' %}btn-secondary{% else %}btn-success{% endif %}"
+                                        data-id="{{ u.id }}"
+                                        data-role="{% if u.profile.role == 'manager' %}visiteur{% else %}manager{% endif %}"
+                                        title="{% if u.profile.role == 'manager' %}Rétrograder Visiteur{% else %}Promouvoir Manager{% endif %}"
+                                        style="border-radius:6px; font-size:0.78rem; padding:0.3rem 0.6rem;">
+                                    {% if u.profile.role == 'manager' %}
+                                        <i class="fas fa-arrow-down"></i>
+                                    {% else %}
+                                        <i class="fas fa-arrow-up"></i>
+                                    {% endif %}
+                                </button>
+                                <!-- Supprimer -->
+                                <button class="btn btn-danger btn-sm delete-user"
+                                        data-id="{{ u.id }}"
+                                        data-name="{{ u.username }}"
+                                        title="Supprimer"
+                                        style="border-radius:6px; font-size:0.78rem; padding:0.3rem 0.6rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% else %}
+                                <span class="text-muted" style="font-size:0.75rem; padding:0.3rem 0.5rem;">
+                                    <i class="fas fa-shield-alt"></i> Protégé
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                            Aucun utilisateur trouvé.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL : MODIFIER UTILISATEUR ===== -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-edit mr-2"></i>Modifier le compte
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span style="color:#fff;">&times;</span>
+                </button>
+            </div>
+            <form method="POST" id="editUserForm">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label-custom">Prénom</label>
+                            <input type="text" class="form-control form-control-custom"
+                                   name="prenom" id="edit_prenom" placeholder="Prénom">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label-custom">Nom</label>
+                            <input type="text" class="form-control form-control-custom"
+                                   name="nom" id="edit_nom" placeholder="Nom">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Nom d'utilisateur <span class="text-danger">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-at input-icon"></i>
+                            <input type="text" class="form-control form-control-custom"
+                                   name="username" id="edit_username" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Email <span class="text-danger">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" class="form-control form-control-custom"
+                                   name="email" id="edit_email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Nouveau mot de passe</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-control form-control-custom"
+                                   name="password" id="edit_password"
+                                   placeholder="Laisser vide pour ne pas changer">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid #e3e6f0;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            style="border-radius:8px;">Annuler</button>
+                    <button type="submit" class="btn btn-warning font-weight-bold"
+                            style="border-radius:8px; color:#fff;">
+                        <i class="fas fa-save mr-1"></i>Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL : CONFIRMER SUPPRESSION ===== -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#e74a3b,#be2617);">
+                <h5 class="modal-title" style="color:#fff;">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Confirmer
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span style="color:#fff;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                <p class="mb-1">Supprimer définitivement le compte</p>
+                <p class="font-weight-bold text-danger" id="deleteName" style="font-size:1.1rem;"></p>
+                <p class="text-muted" style="font-size:0.82rem;">Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer justify-content-center" style="border-top:1px solid #e3e6f0;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        style="border-radius:8px;">Annuler</button>
+                <button type="button" class="btn btn-danger font-weight-bold" id="confirmDelete"
+                        style="border-radius:8px;">
+                    <i class="fas fa-trash mr-1"></i>Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function () {
+
+    // ===== STATS DYNAMIQUES =====
+    var totalUsers = 0, managers = 0, visiteurs = 0, superusers = 0;
+    $('#userTable tbody tr').each(function () {
+        totalUsers++;
+        var badge = $(this).find('[class^="badge-"]').first();
+        if (badge.hasClass('badge-superuser'))      superusers++;
+        else if (badge.hasClass('badge-role-manager')) managers++;
+        else                                           visiteurs++;
+    });
+    // Mettre à jour la carte stats managers (col 2)
+    $('.stat-mini.green .stat-num').text(managers);
+    $('#statVisiteurs').text(visiteurs);
+    $('#statSuperusers').text(superusers);
+
+    // ===== RECHERCHE EN TEMPS RÉEL =====
+    $('#searchUser').on('input', function () {
+        var q = $(this).val().toLowerCase();
+        $('#userTable tbody tr').each(function () {
+            var username = $(this).data('username') || '';
+            var email    = $(this).data('email')    || '';
+            $(this).toggle(username.includes(q) || email.includes(q));
+        });
+    });
+
+    // ===== TOGGLE AFFICHAGE MOT DE PASSE =====
+    $('#togglePwd').click(function () {
+        var input = $('#id_password');
+        var type  = input.attr('type') === 'password' ? 'text' : 'password';
+        input.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+    $('#togglePwdConfirm').click(function () {
+        var input = $('#id_password_confirm');
+        var type  = input.attr('type') === 'password' ? 'text' : 'password';
+        input.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // ===== INDICATEUR FORCE MOT DE PASSE =====
+    $('#id_password').on('input', function () {
+        var pwd = $(this).val();
+        var score = 0;
+        if (pwd.length >= 8)                    score++;
+        if (/[A-Z]/.test(pwd))                  score++;
+        if (/[0-9]/.test(pwd))                  score++;
+        if (/[^A-Za-z0-9]/.test(pwd))           score++;
+
+        var fill   = $('#strengthFill');
+        var text   = $('#strengthText');
+        var levels = [
+            { pct: '0%',   color: '#e3e6f0', label: '',                  cls: '' },
+            { pct: '25%',  color: '#e74a3b', label: '🔴 Très faible',    cls: 'text-danger' },
+            { pct: '50%',  color: '#f6c23e', label: '🟡 Moyen',          cls: 'text-warning' },
+            { pct: '75%',  color: '#4e73df', label: '🔵 Bon',            cls: 'text-primary' },
+            { pct: '100%', color: '#1cc88a', label: '🟢 Très fort',      cls: 'text-success' },
+        ];
+        var lvl = pwd.length === 0 ? levels[0] : levels[score] || levels[4];
+        fill.css({ width: lvl.pct, background: lvl.color });
+        text.text(lvl.label).attr('class', 'strength-text ' + lvl.cls);
+
+        // Vérif correspondance en temps réel
+        checkMatch();
+    });
+
+    // ===== VÉRIFICATION CORRESPONDANCE =====
+    function checkMatch() {
+        var pwd  = $('#id_password').val();
+        var conf = $('#id_password_confirm').val();
+        var mt   = $('#matchText');
+        if (conf.length === 0) { mt.text(''); return; }
+        if (pwd === conf) {
+            mt.text('✅ Les mots de passe correspondent').attr('class', 'strength-text text-success');
+        } else {
+            mt.text('❌ Les mots de passe ne correspondent pas').attr('class', 'strength-text text-danger');
+        }
+    }
+    $('#id_password_confirm').on('input', checkMatch);
+
+    // ===== VALIDATION AVANT SOUMISSION =====
+    $('#createUserForm').on('submit', function (e) {
+        var pwd  = $('#id_password').val();
+        var conf = $('#id_password_confirm').val();
+        var user = $('#id_username').val().trim();
+        var mail = $('#id_email').val().trim();
+
+        if (!user || !mail || !pwd) {
+            e.preventDefault();
+            alert('⚠️ Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+        if (pwd !== conf) {
+            e.preventDefault();
+            alert('❌ Les mots de passe ne correspondent pas.');
+            $('#id_password_confirm').focus();
+            return;
+        }
+        if (pwd.length < 8) {
+            e.preventDefault();
+            alert('🔒 Le mot de passe doit contenir au moins 8 caractères.');
+            $('#id_password').focus();
+            return;
+        }
+        // Animation bouton
+        $('#submitBtn').html('<i class="fas fa-spinner fa-spin mr-2"></i>Création en cours…').prop('disabled', true);
+    });
+
+    // ===== MODAL MODIFIER =====
+    $('.edit-user-btn').click(function () {
+        var id      = $(this).data('id');
+        var uname   = $(this).data('username');
+        var email   = $(this).data('email');
+        var prenom  = $(this).data('prenom');
+        var nom     = $(this).data('nom');
+
+        $('#edit_username').val(uname);
+        $('#edit_email').val(email);
+        $('#edit_prenom').val(prenom);
+        $('#edit_nom').val(nom);
+        $('#edit_password').val('');
+        $('#editUserForm').attr('action', '/dashboard/users/edit/' + id + '/');
+        $('#editModal').modal('show');
+    });
+
+    // ===== CHANGER RÔLE =====
+    $('.role-btn').click(function () {
+        var userId = $(this).data('id');
+        var role   = $(this).data('role');
+        var label  = role === 'manager' ? 'Manager' : 'Visiteur';
+        if (confirm('Changer le rôle vers ' + label + ' ?')) {
+            $.get('/dashboard/users/change-role/' + userId + '/?role=' + role, function (data) {
+                if (data.status === 'success') location.reload();
+                else alert('Erreur : ' + data.message);
+            });
+        }
+    });
+
+    // ===== SUPPRIMER UTILISATEUR =====
+    $('.delete-user').click(function () {
+        var name = $(this).data('name');
+        var id   = $(this).data('id');
+        $('#deleteName').text(name);
+        $('#confirmDelete').data('id', id);
+        $('#deleteModal').modal('show');
+    });
+
+    $('#confirmDelete').click(function () {
+        var id = $(this).data('id');
+        $.get('/dashboard/users/delete/' + id + '/', function (data) {
+            location.reload();
+        });
+        $('#deleteModal').modal('hide');
+    });
+
+    // ===== AUTO-DISMISS ALERTES =====
+    setTimeout(function () {
+        $('.alert').fadeOut('slow');
+    }, 6000);
+
+});
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}AAPSE-UK — Alumni en Planification et Suivi-Évaluation | Université de Kara{% endblock %}
+
+{% block extra_styles %}
+  /* ─── HERO ─────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    background: var(--forest-deep);
+    position: relative;
+    display: flex; align-items: center;
+    overflow: hidden;
+    padding: 100px 5% 80px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(27,77,46,0.6) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 80% at 20% 80%, rgba(200,150,12,0.07) 0%, transparent 55%),
+      linear-gradient(135deg, #0F3020 0%, #1B4D2E 45%, #0F3020 100%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; opacity: .04;
+    background-image:
+      linear-gradient(var(--gold) 1px, transparent 1px),
+      linear-gradient(90deg, var(--gold) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 760px; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 28px;
+    animation: fadeUp .6s ease both;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block; width: 32px; height: 1.5px; background: var(--gold);
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5.5vw, 72px);
+    font-weight: 700; color: var(--white);
+    line-height: 1.12; letter-spacing: -0.5px;
+    margin-bottom: 28px;
+    animation: fadeUp .7s .1s ease both;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold-bright); }
+  .hero-desc {
+    font-size: 17px; font-weight: 300;
+    color: rgba(255,255,255,0.72);
+    max-width: 560px; line-height: 1.75;
+    margin-bottom: 44px;
+    animation: fadeUp .7s .2s ease both;
+  }
+  .hero-actions {
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+    animation: fadeUp .7s .3s ease both;
+  }
+  .hero-stats {
+    position: absolute; right: 5%; bottom: 80px;
+    display: flex; gap: 48px; z-index: 2;
+    animation: fadeUp .7s .5s ease both;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px; font-weight: 700;
+    color: var(--gold); line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-top: 6px;
+  }
+  @media (max-width: 900px) {
+    .hero { flex-direction: column; }
+    .hero-stats { position: static; margin-top: 56px; justify-content: flex-start; }
+  }
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Alumni · Planification · Suivi-Évaluation</div>
+    <h1>Former les <em>planificateurs</em><br>de l'Afrique de demain</h1>
+    <p class="hero-desc">
+      L'AAPSE-UK rassemble les alumni du Master en Planification et Suivi-Évaluation de l'Université de Kara. Ensemble, nous renforçons les capacités, partageons le savoir et contribuons au développement durable du Togo.
+    </p>
+    <div class="hero-actions">
+      <a href="{% url 'contact' %}" class="btn-primary">Rejoindre l'association</a>
+      <a href="{% url 'about' %}" class="btn-secondary">Découvrir notre mission</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">120+</div>
+      <div class="stat-label">Alumni actifs</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Promotions</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Éditions Share To Us</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

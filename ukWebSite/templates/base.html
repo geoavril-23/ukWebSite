@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AAPSE-UK — Association des Alumni en Planification et Suivi-Évaluation de l'Université de Kara{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}L'AAPSE-UK rassemble les alumni du Master en Planification et Suivi-Évaluation de l'Université de Kara. Ensemble, nous renforçons les capacités, partageons le savoir et contribuons au développement durable du Togo.{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --forest: #1B4D2E;
+      --forest-deep: #0F3020;
+      --forest-mid: #245c37;
+      --forest-light: #2E7A4A;
+      --gold: #C8960C;
+      --gold-bright: #E5A90F;
+      --gold-pale: #F5D98B;
+      --gold-wash: #FDF4DC;
+      --cream: #FAF7F0;
+      --white: #FFFFFF;
+      --ink: #1A1A1A;
+      --ink-mid: #3D3D3D;
+      --ink-soft: #666666;
+      --ink-pale: #999999;
+      --rule: rgba(200,150,12,0.25);
+      --rule-dark: rgba(200,150,12,0.45);
+      --shadow-sm: 0 2px 12px rgba(15,48,32,0.08);
+      --shadow-md: 0 8px 40px rgba(15,48,32,0.12);
+      --shadow-lg: 0 20px 80px rgba(15,48,32,0.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── BUTTONS ─────────────────────────────── */
+    .btn-primary {
+      background: var(--gold);
+      color: var(--forest-deep);
+      padding: 14px 32px;
+      font-weight: 600; font-size: 14px;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+      border-radius: 3px;
+      border: none; cursor: pointer;
+      transition: all .2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--gold-bright); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,150,12,0.3); }
+    .btn-secondary {
+      color: rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      padding: 13px 32px;
+      font-weight: 500; font-size: 14px;
+      text-decoration: none;
+      border-radius: 3px;
+      transition: all .2s;
+      display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── SECTIONS COMMUNES ──────────────────────── */
+    section { padding: 96px 5%; }
+    .section-eyebrow {
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-eyebrow::after {
+      content: '';
+      display: block; flex: 0 0 28px; height: 1.5px;
+      background: var(--gold);
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 700; line-height: 1.2;
+      color: var(--forest-deep);
+      margin-bottom: 20px;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .section-lead {
+      font-size: 17px; font-weight: 300;
+      color: var(--ink-soft);
+      max-width: 600px; line-height: 1.75;
+    }
+    .rule { width: 56px; height: 2px; background: var(--gold); margin: 24px 0; }
+
+    /* ─── PAGE HEADER (pour pages internes) ─────── */
+    .page-header {
+      padding: 140px 5% 80px;
+      background: var(--forest-deep);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(27,77,46,0.6) 0%, transparent 65%),
+        linear-gradient(135deg, #0F3020 0%, #1B4D2E 45%, #0F3020 100%);
+    }
+    .page-header-grid {
+      position: absolute; inset: 0; opacity: .04;
+      background-image:
+        linear-gradient(var(--gold) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gold) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .page-header-content { position: relative; z-index: 2; }
+    .page-header-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px;
+    }
+    .page-header-eyebrow::before {
+      content: ''; display: block;
+      width: 32px; height: 1.5px; background: var(--gold);
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 56px);
+      font-weight: 700; color: var(--white);
+      line-height: 1.15; letter-spacing: -0.5px;
+    }
+    .page-header h1 em { font-style: italic; color: var(--gold-bright); }
+    .page-header-desc {
+      font-size: 16px; font-weight: 300;
+      color: rgba(255,255,255,0.65);
+      max-width: 560px; line-height: 1.75;
+      margin-top: 16px;
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp .7s ease both; }
+    .fade-up-1 { animation: fadeUp .7s .1s ease both; }
+    .fade-up-2 { animation: fadeUp .7s .2s ease both; }
+    .fade-up-3 { animation: fadeUp .7s .3s ease both; }
+
+    /* ─── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 900px) {
+      section { padding: 64px 5%; }
+    }
+
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+
+  {% include 'partials/nav.html' %}
+
+  {% if messages %}
+  <div class="messages-container" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 500px;">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin-bottom: 10px; border-radius: 4px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+          {% if message.tags == 'success' %}background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+          {% elif message.tags == 'error' %}background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+          {% else %}background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db;{% endif %}">
+          {{ message }}
+      </div>
+      {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  {% include 'partials/footer.html' %}
+
+  <script>
+    // Active nav link highlight on scroll
+    const sections = document.querySelectorAll('section[id], .page-header[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 100) current = s.getAttribute('id');
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href').endsWith(current) ? 'var(--gold-bright)' : '';
+      });
+    });
+    
+    // Auto-suppression des alertes après 5 secondes
+    setTimeout(function() {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(function(alert) {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+      });
+    }, 5000);
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

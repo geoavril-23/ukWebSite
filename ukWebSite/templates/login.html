@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Connexion — AAPSE-UK{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container fade-up">
+        <div class="auth-header">
+            <h1 class="section-title"><em>Connexion</em></h1>
+            <p class="section-lead">Bienvenue ! Veuillez vous connecter pour accéder à votre espace membre.</p>
+        </div>
+        
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="alert alert-error">
+                    <p>Nom d'utilisateur ou mot de passe incorrect.</p>
+                </div>
+            {% endif %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Se connecter</button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Pas encore de compte ? <a href="{% url 'register' %}">S'inscrire ici</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .auth-section {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 120px; /* Espace pour la navbar fixe */
+        background-color: var(--cream);
+    }
+    
+    .auth-container {
+        background: var(--white);
+        padding: 50px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto; /* Force le centrage horizontal */
+        border-top: 4px solid var(--gold);
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .auth-header .section-title {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .auth-header .section-lead {
+        font-size: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--forest-deep);
+        font-size: 14px;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 4px;
+        font-family: 'Source Sans 3', sans-serif;
+        font-size: 15px;
+        transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(200, 150, 12, 0.1);
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+        font-size: 14px;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        font-size: 15px;
+    }
+    
+    .auth-footer a {
+        color: var(--forest-light);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .auth-footer a:hover {
+        color: var(--gold-bright);
+    }
+</style>
+{% endblock %}

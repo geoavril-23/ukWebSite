@@ -1,0 +1,89 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord — AAPSE-UK{% endblock %}
+
+{% block content %}
+<input type="hidden" id="lastCount" value="{{ pending_messages }}" style="display:none;">
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Tableau de bord</h1>
+    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+            class="fas fa-download fa-sm text-white-50"></i> Générer Rapport</a>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+
+    <!-- Total Messages Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Messages</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_messages }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-envelope fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests LIVE (Manager only) -->
+    {% if user.profile.role == 'manager' %}
+    <div class="col-xl-3 col-md-6 mb-4" id="pendingCard">
+        <div class="card border-left-warning shadow h-100 py-2 notification-card animate-pulse">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            NOUVEAUX <span class="notification-badge badge badge-danger" id="pendingBadge">0</span></div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="pendingCount">{{ pending_messages }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-warning notification-icon animate-blink" id="notificationIcon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- WhatsApp Contacts Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Contacts WhatsApp</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ whatsapp_contacts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fab fa-whatsapp fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Demandes récentes</h6>
+            </div>
+            <div class="card-body">
+                <p>Bienvenue dans votre espace de gestion. Les messages reçus via le formulaire de contact s'afficheront ici.</p>
+                <a href="{% url 'admin_messages' %}" class="btn btn-primary">Voir tous les messages</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

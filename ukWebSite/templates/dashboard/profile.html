@@ -1,0 +1,141 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Mon profil — AAPSE-UK{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">👤 Mon profil</h1>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <!-- Colonne 1: Photo -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center py-4">
+                <div class="avatar-wrap mb-3">
+                    {% if profile.photo and profile.photo.name != 'profiles/default-avatar.png' %}
+                        <img id="profilePhoto" src="{{ profile.photo.url }}" alt="Photo de profil"
+                             class="rounded-circle shadow" style="width:140px;height:140px;object-fit:cover;border:4px solid #4e73df;">
+                    {% else %}
+                        <div id="profilePhotoDefault" class="rounded-circle shadow d-flex align-items-center justify-content-center mx-auto"
+                             style="width:140px;height:140px;background:#eaecf4;border:4px solid #4e73df;">
+                            <i class="fas fa-user-circle" style="font-size:90px;color:#4e73df;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h5 class="font-weight-bold mb-1">{{ request.user.username }}</h5>
+                <p class="text-muted mb-3">
+                    <span class="badge badge-{% if profile.role == 'manager' %}warning{% else %}secondary{% endif %} px-3 py-1">
+                        {{ profile.get_role_display }}
+                    </span>
+                </p>
+
+                <!-- Bouton changer photo -->
+                <form method="POST" action="{% url 'profile_update' %}" enctype="multipart/form-data" id="photoForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="photo">
+                    <input type="file" id="imageUpload" name="photo" accept="image/*" class="d-none">
+                    <label for="imageUpload" class="btn btn-primary btn-sm mb-2 w-100">
+                        <i class="fas fa-camera mr-1"></i> Changer la photo
+                    </label>
+                </form>
+
+                <!-- Bouton supprimer photo -->
+                {% if profile.photo %}
+                <form method="POST" action="{% url 'profile_update' %}" id="deletePhotoForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_photo">
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100"
+                            onclick="return confirm('Supprimer la photo de profil ?')">
+                        <i class="fas fa-trash mr-1"></i> Supprimer la photo
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Colonne 2: Formulaire édition -->
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">✏️ Modifier mes informations</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'profile_update' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="info">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Prénom</label>
+                            <input type="text" class="form-control" name="prenom" value="{{ profile.prenom }}" placeholder="Votre prénom">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Nom</label>
+                            <input type="text" class="form-control" name="nom" value="{{ profile.nom }}" placeholder="Votre nom">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ request.user.email }}" placeholder="Votre email">
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Bio <small class="text-muted">(optionnel)</small></label>
+                        <textarea class="form-control" name="bio" rows="3" maxlength="500" placeholder="Quelques mots sur vous...">{{ profile.bio }}</textarea>
+                        <small class="text-muted" id="bioCount">{{ profile.bio|length }}/500 caractères</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Rôle</label>
+                        <input type="text" class="form-control bg-light" value="{{ profile.get_role_display }}" readonly>
+                        <small class="text-muted">Le rôle est géré par l'administrateur.</small>
+                    </div>
+                    <hr>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save mr-1"></i> Sauvegarder
+                    </button>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-arrow-left mr-1"></i> Retour
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Prévisualisation + upload auto de la photo
+document.getElementById('imageUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Prévisualisation immédiate
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        document.getElementById('profilePhoto').src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    // Soumettre le formulaire automatiquement
+    document.getElementById('photoForm').submit();
+});
+
+// Compteur bio
+const bioField = document.querySelector('textarea[name="bio"]');
+const bioCount = document.getElementById('bioCount');
+if (bioField && bioCount) {
+    bioField.addEventListener('input', function() {
+        bioCount.textContent = this.value.length + '/500 caractères';
+    });
+}
+</script>
+
+{% endblock %}

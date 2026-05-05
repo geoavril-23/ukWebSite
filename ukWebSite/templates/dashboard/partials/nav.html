@@ -1,0 +1,51 @@
+{% load static %}
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Topbar Navbar -->
+    <ul class="navbar-nav ml-auto">
+
+        <!-- Theme Toggle -->
+        <li class="nav-item d-flex align-items-center">
+            <div class="theme-toggle" id="themeToggle" title="Changer de thème">
+                <i class="fas fa-moon"></i>
+            </div>
+        </li>
+
+        <div class="topbar-divider d-none d-sm-block"></div>
+
+        <!-- Nav Item - User Information -->
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                    {% if request.user.profile.prenom %}{{ request.user.profile.prenom }}{% else %}{{ request.user.username }}{% endif %}
+                </span>
+                {% if request.user.profile.photo and request.user.profile.photo.name != 'profiles/default-avatar.png' %}
+                    <img src="{{ request.user.profile.photo.url }}" alt="photo" class="img-profile rounded-circle" style="width:32px;height:32px;object-fit:cover;">
+                {% else %}
+                    <i class="fas fa-user-circle fa-2x" style="color:#4e73df;"></i>
+                {% endif %}
+            </a>
+            <!-- Dropdown - User Information -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="{% url 'profile' %}">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Mon Profil
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Déconnexion
+                </a>
+            </div>
+        </li>
+
+    </ul>
+
+</nav>

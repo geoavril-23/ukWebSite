@@ -1,0 +1,773 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Messages de contact — AAPSE-UK{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== EN-TÊTE ===== */
+    .page-header-desc { font-size: 0.88rem; color: #858796; }
+
+    /* ===== ONGLETS STATUT ===== */
+    .status-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .status-tab {
+        display: flex; align-items: center; gap: 0.5rem;
+        padding: 0.55rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.85rem; font-weight: 600;
+        text-decoration: none;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .status-tab.all      { background:#f0f2ff; color:#4e73df; border-color:#c5cdf7; }
+    .status-tab.attente  { background:#fff8e6; color:#d4a017; border-color:#f6c23e; }
+    .status-tab.termine  { background:#eafaf4; color:#1a9e6e; border-color:#1cc88a; }
+    .status-tab.active, .status-tab:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    .status-tab.all.active     { background:#4e73df; color:#fff; border-color:#4e73df; }
+    .status-tab.attente.active { background:#f6c23e; color:#fff; border-color:#f6c23e; }
+    .status-tab.termine.active { background:#1cc88a; color:#fff; border-color:#1cc88a; }
+    .tab-count {
+        background: rgba(255,255,255,0.35);
+        border-radius: 20px;
+        padding: 0.1em 0.55em;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+    .status-tab.active .tab-count { background: rgba(255,255,255,0.3); }
+
+    /* ===== FILTRES PÉRIODE ===== */
+    .filter-card {
+        background: #fff;
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    .filter-card .filter-header {
+        background: linear-gradient(135deg, #f8f9fc, #eef0fb);
+        padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid #e3e6f0;
+        display: flex; align-items: center; gap: 0.5rem;
+        font-size: 0.85rem; font-weight: 700; color: #5a5c69;
+        cursor: pointer;
+    }
+    .filter-card .filter-body { padding: 1.25rem; }
+    .periode-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .periode-btn {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        border: 2px solid #d1d3e2;
+        background: #f8f9fc;
+        font-size: 0.82rem; font-weight: 600; color: #5a5c69;
+        cursor: pointer; transition: all 0.18s;
+        text-decoration: none;
+    }
+    .periode-btn:hover, .periode-btn.active {
+        background: #4e73df; color: #fff; border-color: #4e73df;
+        box-shadow: 0 2px 8px rgba(78,115,223,0.25);
+    }
+    .filter-inputs { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; }
+    .filter-inputs .form-group { margin: 0; }
+    .filter-inputs label { font-size: 0.75rem; font-weight: 700; color: #858796; text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 0.3rem; }
+    .filter-inputs select,
+    .filter-inputs input[type="date"] {
+        border: 1.5px solid #d1d3e2; border-radius: 8px;
+        padding: 0.45rem 0.75rem; font-size: 0.88rem;
+        background: #f8f9fc; color: #5a5c69;
+        transition: border-color 0.2s;
+    }
+    .filter-inputs select:focus,
+    .filter-inputs input[type="date"]:focus {
+        border-color: #4e73df; outline: none;
+        box-shadow: 0 0 0 3px rgba(78,115,223,0.12);
+    }
+    .btn-filter-apply {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: #fff; border: none; border-radius: 8px;
+        padding: 0.5rem 1.25rem; font-size: 0.85rem; font-weight: 700;
+        cursor: pointer; transition: all 0.2s;
+        box-shadow: 0 3px 8px rgba(78,115,223,0.25);
+    }
+    .btn-filter-apply:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(78,115,223,0.35); }
+    .btn-filter-reset {
+        background: #f8f9fc; color: #858796;
+        border: 1.5px solid #d1d3e2; border-radius: 8px;
+        padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600;
+        cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-filter-reset:hover { background: #e3e6f0; color: #5a5c69; }
+    .active-filter-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: #eef0fb; color: #4e73df;
+        border: 1px solid #c5cdf7; border-radius: 20px;
+        padding: 0.25em 0.75em; font-size: 0.78rem; font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    /* ===== TABLEAU ===== */
+    .messages-card {
+        border: none; border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .messages-card .card-header {
+        background: #fff; border-bottom: 2px solid #e3e6f0;
+        padding: 1rem 1.5rem;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .messages-card .card-header h6 { font-weight: 700; color: #5a5c69; margin: 0; }
+    .table thead th {
+        background: #f8f9fc; border-bottom: 2px solid #e3e6f0;
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.5px; color: #858796; padding: 0.8rem 1rem;
+    }
+    .table tbody td {
+        vertical-align: middle; padding: 0.85rem 1rem;
+        font-size: 0.88rem; color: #5a5c69;
+        border-bottom: 1px solid #f0f0f5;
+    }
+    .table tbody tr:hover { background: #fafbff; }
+    .table tbody tr.row-termine { background: #f6fef9; }
+    .table tbody tr.row-termine:hover { background: #edfaf4; }
+
+    /* ===== BADGES STATUT ===== */
+    .badge-attente {
+        background: linear-gradient(135deg, #f6c23e, #dda20a);
+        color: #fff; padding: 0.3em 0.8em; border-radius: 20px;
+        font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+    }
+    .badge-termine {
+        background: linear-gradient(135deg, #1cc88a, #13855c);
+        color: #fff; padding: 0.3em 0.8em; border-radius: 20px;
+        font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+    }
+    .badge-sujet {
+        background: #eef0fb; color: #4e73df;
+        padding: 0.25em 0.65em; border-radius: 12px;
+        font-size: 0.75rem; font-weight: 600;
+    }
+
+    /* ===== BOUTON TERMINER ===== */
+    .btn-terminer {
+        background: linear-gradient(135deg, #1cc88a, #13855c);
+        color: #fff; border: none; border-radius: 7px;
+        padding: 0.3rem 0.7rem; font-size: 0.78rem; font-weight: 700;
+        cursor: pointer; transition: all 0.2s;
+        box-shadow: 0 2px 6px rgba(28,200,138,0.3);
+        white-space: nowrap;
+    }
+    .btn-terminer:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(28,200,138,0.4); }
+    .btn-terminer:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ===== BOUTONS ACTION ===== */
+    .btn-wa {
+        background: #25d366; color: #fff; border: none;
+        border-radius: 7px; padding: 0.3rem 0.55rem;
+        font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+        text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn-wa:hover { background: #1da851; color: #fff; transform: translateY(-1px); }
+    .btn-email {
+        background: #4e73df; color: #fff; border: none;
+        border-radius: 7px; padding: 0.3rem 0.55rem;
+        font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+        text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn-email:hover { background: #224abe; color: #fff; transform: translateY(-1px); }
+    .btn-del {
+        background: #e74a3b; color: #fff; border: none;
+        border-radius: 7px; padding: 0.3rem 0.55rem;
+        font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-del:hover { background: #be2617; transform: translateY(-1px); }
+
+    /* ===== TOAST NOTIFICATION ===== */
+    #toastContainer {
+        position: fixed; bottom: 1.5rem; right: 1.5rem;
+        z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .toast-msg {
+        background: #fff; border-radius: 12px;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+        padding: 0.9rem 1.2rem; min-width: 280px;
+        display: flex; align-items: center; gap: 0.75rem;
+        animation: slideIn 0.3s ease;
+        border-left: 4px solid #1cc88a;
+    }
+    .toast-msg.error { border-left-color: #e74a3b; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast-icon { font-size: 1.3rem; }
+    .toast-text { font-size: 0.88rem; font-weight: 600; color: #5a5c69; flex: 1; }
+    .toast-wa-btn {
+        background: #25d366; color: #fff; border: none;
+        border-radius: 6px; padding: 0.3rem 0.7rem;
+        font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        text-decoration: none; white-space: nowrap;
+    }
+
+    /* ===== PAGINATION ===== */
+    .pagination .page-link {
+        border-radius: 8px; margin: 0 2px;
+        font-size: 0.85rem; color: #4e73df;
+        border: 1.5px solid #d1d3e2;
+    }
+    .pagination .page-item.active .page-link {
+        background: #4e73df; border-color: #4e73df; color: #fff;
+    }
+
+    /* ===== VIDE ===== */
+    .empty-state { text-align: center; padding: 3rem 1rem; color: #b7b9cc; }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .empty-state p { font-size: 0.95rem; margin: 0; }
+
+    /* ===== ALERTES ===== */
+    .alert { border-radius: 10px; border: none; font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== EN-TÊTE ===== -->
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1 text-gray-800 font-weight-bold">
+            <i class="fas fa-inbox text-primary mr-2"></i>Messages de contact
+        </h1>
+        <p class="page-header-desc mb-0">
+            Gérez les demandes, marquez-les comme traitées et filtrez par période.
+        </p>
+    </div>
+    <div class="mt-2 mt-sm-0">
+        <span class="badge badge-pill badge-success px-3 py-2" style="font-size:0.82rem;">
+            <i class="fas fa-user-tie mr-1"></i>Manager
+        </span>
+    </div>
+</div>
+
+<!-- ===== ALERTES DJANGO ===== -->
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<!-- ===== ONGLETS STATUT ===== -->
+<div class="status-tabs">
+    <a href="{% url 'admin_messages' %}{% if periode %}?periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}"
+       class="status-tab all {% if not statut_filter %}active{% endif %}">
+        <i class="fas fa-list"></i> Tous
+        <span class="tab-count">{{ total_all }}</span>
+    </a>
+    <a href="?statut=attente{% if periode %}&periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}"
+       class="status-tab attente {% if statut_filter == 'attente' %}active{% endif %}">
+        <i class="fas fa-clock"></i> En attente
+        <span class="tab-count">{{ total_attente }}</span>
+    </a>
+    <a href="?statut=termine{% if periode %}&periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}"
+       class="status-tab termine {% if statut_filter == 'termine' %}active{% endif %}">
+        <i class="fas fa-check-circle"></i> Cas terminés
+        <span class="tab-count">{{ total_termine }}</span>
+    </a>
+</div>
+
+<!-- ===== FILTRES PÉRIODE ===== -->
+<div class="filter-card">
+    <div class="filter-header" data-toggle="collapse" data-target="#filterBody">
+        <i class="fas fa-calendar-alt text-primary"></i>
+        Filtrer par période
+        {% if periode %}
+            <span class="active-filter-badge">
+                <i class="fas fa-check" style="font-size:0.65rem;"></i>
+                Filtre actif :
+                {% if periode == 'jour' %}Jour — {{ jour }}
+                {% elif periode == 'mois' %}Mois {{ mois }}/{{ annee }}
+                {% elif periode == 'annee' %}Année {{ annee }}
+                {% endif %}
+            </span>
+        {% endif %}
+        <i class="fas fa-chevron-down ml-auto" style="font-size:0.75rem; color:#b7b9cc;"></i>
+    </div>
+    <div id="filterBody" class="filter-body {% if not periode %}collapse{% endif %}">
+        <!-- Boutons type de période -->
+        <div class="periode-btns mb-3">
+            <button type="button" class="periode-btn {% if periode == 'jour' %}active{% endif %}"
+                    onclick="showPeriode('jour')">
+                <i class="fas fa-calendar-day mr-1"></i>Par jour
+            </button>
+            <button type="button" class="periode-btn {% if periode == 'mois' %}active{% endif %}"
+                    onclick="showPeriode('mois')">
+                <i class="fas fa-calendar-week mr-1"></i>Par mois
+            </button>
+            <button type="button" class="periode-btn {% if periode == 'annee' %}active{% endif %}"
+                    onclick="showPeriode('annee')">
+                <i class="fas fa-calendar mr-1"></i>Par année
+            </button>
+        </div>
+
+        <form method="GET" action="{% url 'admin_messages' %}" id="filterForm">
+            {% if statut_filter %}<input type="hidden" name="statut" value="{{ statut_filter }}">{% endif %}
+            <input type="hidden" name="periode" id="periodeInput" value="{{ periode }}">
+
+            <div class="filter-inputs">
+
+                <!-- Filtre JOUR -->
+                <div class="form-group" id="inputJour" style="display:{% if periode == 'jour' %}block{% else %}none{% endif %};">
+                    <label><i class="fas fa-calendar-day mr-1"></i>Date</label>
+                    <input type="date" name="jour" value="{{ jour }}" id="jourInput">
+                </div>
+
+                <!-- Filtre MOIS -->
+                <div class="form-group" id="inputMois" style="display:{% if periode == 'mois' %}block{% else %}none{% endif %};">
+                    <label><i class="fas fa-calendar-week mr-1"></i>Mois</label>
+                    <select name="mois" id="moisInput">
+                        <option value="">-- Mois --</option>
+                        {% for m in "123456789101112"|make_list %}{% endfor %}
+                        <option value="1"  {% if mois == '1'  %}selected{% endif %}>Janvier</option>
+                        <option value="2"  {% if mois == '2'  %}selected{% endif %}>Février</option>
+                        <option value="3"  {% if mois == '3'  %}selected{% endif %}>Mars</option>
+                        <option value="4"  {% if mois == '4'  %}selected{% endif %}>Avril</option>
+                        <option value="5"  {% if mois == '5'  %}selected{% endif %}>Mai</option>
+                        <option value="6"  {% if mois == '6'  %}selected{% endif %}>Juin</option>
+                        <option value="7"  {% if mois == '7'  %}selected{% endif %}>Juillet</option>
+                        <option value="8"  {% if mois == '8'  %}selected{% endif %}>Août</option>
+                        <option value="9"  {% if mois == '9'  %}selected{% endif %}>Septembre</option>
+                        <option value="10" {% if mois == '10' %}selected{% endif %}>Octobre</option>
+                        <option value="11" {% if mois == '11' %}selected{% endif %}>Novembre</option>
+                        <option value="12" {% if mois == '12' %}selected{% endif %}>Décembre</option>
+                    </select>
+                </div>
+
+                <!-- Filtre ANNÉE (commun à mois + annee) -->
+                <div class="form-group" id="inputAnnee" style="display:{% if periode == 'mois' or periode == 'annee' %}block{% else %}none{% endif %};">
+                    <label><i class="fas fa-calendar mr-1"></i>Année</label>
+                    <select name="annee" id="anneeInput">
+                        <option value="">-- Année --</option>
+                        {% for y in annees_dispo %}
+                        <option value="{{ y }}" {% if annee == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+                        {% empty %}
+                        <option value="2026">2026</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Boutons -->
+                <div class="form-group" id="inputBtns" style="display:{% if periode %}flex{% else %}none{% endif %}; gap:0.5rem;">
+                    <button type="submit" class="btn-filter-apply">
+                        <i class="fas fa-search mr-1"></i>Filtrer
+                    </button>
+                    <a href="{% url 'admin_messages' %}{% if statut_filter %}?statut={{ statut_filter }}{% endif %}"
+                       class="btn-filter-reset">
+                        <i class="fas fa-times mr-1"></i>Réinitialiser
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===== TABLEAU DES MESSAGES ===== -->
+<div class="card messages-card">
+    <div class="card-header">
+        <h6>
+            {% if statut_filter == 'attente' %}
+                <i class="fas fa-clock text-warning mr-2"></i>Demandes en attente
+            {% elif statut_filter == 'termine' %}
+                <i class="fas fa-check-circle text-success mr-2"></i>Cas terminés
+            {% else %}
+                <i class="fas fa-list text-primary mr-2"></i>Toutes les demandes
+            {% endif %}
+            <span class="text-muted" style="font-size:0.82rem; font-weight:400;">
+                — {{ page_obj.paginator.count }} résultat{{ page_obj.paginator.count|pluralize }}
+                {% if periode %}
+                    <span class="active-filter-badge">
+                        {% if periode == 'jour' %}📅 {{ jour }}
+                        {% elif periode == 'mois' %}📅 Mois {{ mois }}/{{ annee }}
+                        {% elif periode == 'annee' %}📅 Année {{ annee }}
+                        {% endif %}
+                    </span>
+                {% endif %}
+            </span>
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:130px;">Date</th>
+                        <th>Demandeur</th>
+                        <th>Sujet</th>
+                        <th>Contact</th>
+                        <th style="width:110px;">Statut</th>
+                        <th style="width:200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in page_obj %}
+                    <tr class="{% if msg.statut == 'termine' %}row-termine{% endif %}" id="row-{{ msg.pk }}">
+                        <td>
+                            <div style="font-size:0.82rem; font-weight:600; color:#5a5c69;">
+                                {{ msg.date_envoi|date:"d/m/Y" }}
+                            </div>
+                            <div style="font-size:0.75rem; color:#b7b9cc;">
+                                {{ msg.date_envoi|date:"H:i" }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="font-weight-bold" style="font-size:0.88rem;">
+                                {{ msg.prenom }} {{ msg.nom }}
+                            </div>
+                            <div style="font-size:0.75rem; color:#858796;">
+                                {{ msg.email }}
+                            </div>
+                            {% if msg.institution %}
+                            <div style="font-size:0.72rem; color:#b7b9cc;">
+                                <i class="fas fa-university" style="font-size:0.65rem;"></i> {{ msg.institution }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge-sujet">{{ msg.get_sujet_display }}</span>
+                            {% if msg.promotion %}
+                            <div style="font-size:0.72rem; color:#b7b9cc; margin-top:3px;">
+                                Promo {{ msg.promotion }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if msg.telephone %}
+                            <div style="font-size:0.82rem; font-weight:600;">
+                                <a href="tel:{{ msg.telephone }}" style="color:#25d366; text-decoration:none;" title="Appeler">
+                                    <i class="fas fa-phone" style="font-size:0.7rem;"></i>
+                                    {{ msg.telephone }}
+                                </a>
+                            </div>
+                            {% else %}
+                            <span class="text-muted" style="font-size:0.78rem;">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if msg.statut == 'attente' %}
+                                <span class="badge-attente">
+                                    <i class="fas fa-clock mr-1"></i>En attente
+                                </span>
+                            {% else %}
+                                <span class="badge-termine">
+                                    <i class="fas fa-check mr-1"></i>Terminé
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap" style="gap:4px;">
+                                <!-- Bouton TERMINER (seulement si en attente) -->
+                                {% if msg.statut == 'attente' %}
+                                <button class="btn-terminer mark-done-btn"
+                                        data-pk="{{ msg.pk }}"
+                                        data-url="{% url 'mark_completed' msg.pk %}"
+                                        title="Marquer comme terminé">
+                                    <i class="fas fa-check mr-1"></i>Terminer
+                                </button>
+                                {% endif %}
+
+                                <!-- WhatsApp -->
+                                {% if msg.telephone %}
+                                {% if msg.statut == 'attente' %}
+                                <a href="https://wa.me/{{ msg.telephone|cut:' '|cut:'+'|cut:'-'|cut:'('|cut:')' }}?text=Bonjour%20{{ msg.prenom }}%2C%20votre%20demande%20est%20en%20cours%20de%20traitement.%20Nous%20vous%20contacterons%20tr%C3%A8s%20prochainement."
+                                   target="_blank" class="btn-wa" title="WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                {% else %}
+                                <a href="https://wa.me/{{ msg.telephone|cut:' '|cut:'+'|cut:'-'|cut:'('|cut:')' }}?text=Bonjour%20{{ msg.prenom }}%2C%20votre%20demande%20a%20%C3%A9t%C3%A9%20trait%C3%A9e%20avec%20succ%C3%A8s.%20Merci%20de%20votre%20confiance%20%E2%80%94%20L%27%C3%A9quipe%20AAPSE-UK."
+                                   target="_blank" class="btn-wa" title="WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                {% endif %}
+                                {% endif %}
+
+                                <!-- Email → Gmail web -->
+                                <a href="https://mail.google.com/mail/?view=cm&to={{ msg.email }}&su=Traitement+de+votre+demande&body=Bonjour+{{ msg.prenom }}%2C%0A%0AVotre+demande+a+%C3%A9t%C3%A9+trait%C3%A9e+avec+succ%C3%A8s.%0A%0AL%27%C3%A9quipe+AAPSE-UK"
+                                   target="_blank" class="btn-email" title="Envoyer un email">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+
+                                <!-- Voir message (modal) -->
+                                <button class="btn btn-sm btn-outline-secondary view-msg-btn"
+                                        data-pk="{{ msg.pk }}"
+                                        data-prenom="{{ msg.prenom }}"
+                                        data-nom="{{ msg.nom }}"
+                                        data-email="{{ msg.email }}"
+                                        data-sujet="{{ msg.get_sujet_display }}"
+                                        data-message="{{ msg.message|escapejs }}"
+                                        data-date="{{ msg.date_envoi|date:'d/m/Y H:i' }}"
+                                        data-statut="{{ msg.statut }}"
+                                        title="Voir le message"
+                                        style="border-radius:7px; padding:0.3rem 0.55rem; font-size:0.78rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>
+                                    {% if statut_filter == 'attente' %}Aucune demande en attente.
+                                    {% elif statut_filter == 'termine' %}Aucun cas terminé pour cette période.
+                                    {% else %}Aucun message trouvé.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3 px-4">
+        <div class="text-muted" style="font-size:0.82rem;">
+            Page <strong>{{ page_obj.number }}</strong> sur <strong>{{ page_obj.paginator.num_pages }}</strong>
+            — {{ page_obj.paginator.count }} résultat{{ page_obj.paginator.count|pluralize }}
+        </div>
+        <nav>
+            <ul class="pagination mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if periode %}&periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if periode %}&periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if periode %}&periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if periode %}&periode={{ periode }}{% if jour %}&jour={{ jour }}{% endif %}{% if mois %}&mois={{ mois }}{% endif %}{% if annee %}&annee={{ annee }}{% endif %}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ===== MODAL : VOIR MESSAGE ===== -->
+<div class="modal fade" id="viewMsgModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content" style="border:none; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.15);">
+            <div class="modal-header" style="background:linear-gradient(135deg,#4e73df,#224abe); border-radius:16px 16px 0 0; border:none; padding:1.2rem 1.5rem;">
+                <h5 class="modal-title" style="color:#fff; font-weight:700;">
+                    <i class="fas fa-envelope-open mr-2"></i>
+                    <span id="modalTitle">Détail du message</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span style="color:#fff;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small class="text-muted text-uppercase font-weight-bold" style="font-size:0.72rem; letter-spacing:0.5px;">Demandeur</small>
+                        <p class="font-weight-bold mb-0" id="modalNom" style="font-size:1rem;"></p>
+                        <p class="text-muted mb-0" id="modalEmail" style="font-size:0.85rem;"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted text-uppercase font-weight-bold" style="font-size:0.72rem; letter-spacing:0.5px;">Sujet</small>
+                        <p class="mb-0" id="modalSujet"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted text-uppercase font-weight-bold" style="font-size:0.72rem; letter-spacing:0.5px;">Date</small>
+                        <p class="mb-0" id="modalDate" style="font-size:0.85rem;"></p>
+                    </div>
+                </div>
+                <hr style="border-color:#e3e6f0;">
+                <div>
+                    <small class="text-muted text-uppercase font-weight-bold" style="font-size:0.72rem; letter-spacing:0.5px;">Message</small>
+                    <div id="modalMessage" style="background:#f8f9fc; border-radius:10px; padding:1rem; margin-top:0.5rem; font-size:0.92rem; color:#5a5c69; line-height:1.6; white-space:pre-wrap;"></div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #e3e6f0;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius:8px;">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toastContainer"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function () {
+
+    // ===== FILTRES PÉRIODE =====
+    function showPeriode(type) {
+        $('#periodeInput').val(type);
+        $('#inputJour').hide();
+        $('#inputMois').hide();
+        $('#inputAnnee').hide();
+        $('#inputBtns').show().css('display', 'flex');
+
+        if (type === 'jour')   { $('#inputJour').show(); }
+        if (type === 'mois')   { $('#inputMois').show(); $('#inputAnnee').show(); }
+        if (type === 'annee')  { $('#inputAnnee').show(); }
+
+        // Activer le bon bouton
+        $('.periode-btn').removeClass('active');
+        $('.periode-btn').each(function() {
+            if ($(this).attr('onclick') === "showPeriode('" + type + "')") {
+                $(this).addClass('active');
+            }
+        });
+    }
+    window.showPeriode = showPeriode;
+
+    // ===== MARQUER COMME TERMINÉ (AJAX) =====
+    $(document).on('click', '.mark-done-btn', function () {
+        var btn = $(this);
+        var pk  = btn.data('pk');
+        var url = btn.data('url');
+
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>...');
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+                if (data.status === 'success') {
+                    // Mettre à jour la ligne visuellement
+                    var row = $('#row-' + pk);
+                    row.addClass('row-termine');
+
+                    // Remplacer badge
+                    row.find('.badge-attente').replaceWith(
+                        '<span class="badge-termine"><i class="fas fa-check mr-1"></i>Terminé</span>'
+                    );
+
+                    // Supprimer le bouton "Terminer"
+                    btn.remove();
+
+                    // Mettre à jour le lien WhatsApp de la ligne (message "terminé")
+                    var waLink = row.find('.btn-wa');
+                    if (waLink.length && data.whatsapp) {
+                        waLink.attr('href', data.whatsapp);
+                    }
+
+                    // Toast succès
+                    showToast('✅', 'Demande #' + pk + ' marquée comme terminée !', data.whatsapp, data.prenom);
+
+                    // Mettre à jour les compteurs
+                    updateCounters();
+                } else {
+                    btn.prop('disabled', false).html('<i class="fas fa-check mr-1"></i>Terminer');
+                    showToast('❌', 'Erreur : ' + (data.error || 'Inconnue'), null, null, true);
+                }
+            },
+            error: function () {
+                btn.prop('disabled', false).html('<i class="fas fa-check mr-1"></i>Terminer');
+                showToast('❌', 'Erreur réseau. Réessayez.', null, null, true);
+            }
+        });
+    });
+
+    // ===== VOIR MESSAGE (MODAL) =====
+    $(document).on('click', '.view-msg-btn', function () {
+        var prenom  = $(this).data('prenom');
+        var nom     = $(this).data('nom');
+        var email   = $(this).data('email');
+        var sujet   = $(this).data('sujet');
+        var message = $(this).data('message');
+        var date    = $(this).data('date');
+
+        $('#modalTitle').text('Message de ' + prenom + ' ' + nom);
+        $('#modalNom').text(prenom + ' ' + nom);
+        $('#modalEmail').text(email);
+        $('#modalSujet').html('<span class="badge-sujet">' + sujet + '</span>');
+        $('#modalDate').text(date);
+        $('#modalMessage').text(message);
+        $('#viewMsgModal').modal('show');
+    });
+
+    // ===== SUPPRESSION AJAX =====
+    $(document).on('click', '.delete-btn', function (e) {
+        e.preventDefault();
+        if (!confirm('Supprimer définitivement cette demande ?')) return;
+        var btn = $(this);
+        var url = btn.data('url');
+        $.ajax({
+            url: url, type: 'GET',
+            success: function (resp) {
+                if (resp.status === 'success') {
+                    btn.closest('tr').fadeOut(400, function () { $(this).remove(); });
+                    showToast('🗑️', 'Message supprimé.', null, null);
+                    updateCounters();
+                } else {
+                    alert('Erreur : ' + resp.message);
+                }
+            },
+            error: function () { alert('Erreur réseau.'); }
+        });
+    });
+
+    // ===== TOAST =====
+    function showToast(icon, text, waUrl, prenom, isError) {
+        var toastId = 'toast-' + Date.now();
+        var waBtn = '';
+        if (waUrl) {
+            waBtn = '<a href="' + waUrl + '" target="_blank" class="toast-wa-btn">' +
+                    '<i class="fab fa-whatsapp mr-1"></i>WhatsApp</a>';
+        }
+        var html = '<div class="toast-msg ' + (isError ? 'error' : '') + '" id="' + toastId + '">' +
+                   '<span class="toast-icon">' + icon + '</span>' +
+                   '<span class="toast-text">' + text + '</span>' +
+                   waBtn +
+                   '</div>';
+        $('#toastContainer').append(html);
+        setTimeout(function () { $('#' + toastId).fadeOut(400, function () { $(this).remove(); }); }, 6000);
+    }
+
+    // ===== MISE À JOUR COMPTEURS ONGLETS =====
+    function updateCounters() {
+        $.get('/dashboard/api/pending-count/', function (data) {
+            // Recharger la page pour mettre à jour les compteurs d'onglets
+            // (optionnel : on peut aussi faire un appel dédié)
+        });
+    }
+
+    // ===== AUTO-DISMISS ALERTES =====
+    setTimeout(function () { $('.alert').fadeOut('slow'); }, 6000);
+
+    // ===== COLLAPSE FILTRE =====
+    {% if periode %}
+    $('#filterBody').addClass('show');
+    {% endif %}
+});
+</script>
+{% endblock %}

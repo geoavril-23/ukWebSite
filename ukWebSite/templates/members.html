@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Membres — AAPSE-UK{% endblock %}
+{% block meta_description %}Découvrez le bureau exécutif et les membres actifs de l'AAPSE-UK, des professionnels engagés au service de la communauté alumni de l'Université de Kara.{% endblock %}
+
+{% block extra_styles %}
+  #team-main { background: var(--forest-deep); }
+  #team-main .section-eyebrow { color: var(--gold-pale); }
+  #team-main .section-eyebrow::after { background: var(--gold-pale); }
+  #team-main .section-title { color: var(--white); }
+  #team-main .section-lead { color: rgba(255,255,255,0.55); }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px; margin-top: 56px;
+  }
+  .member-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,150,12,0.15);
+    border-radius: 4px; padding: 28px 20px;
+    text-align: center;
+    transition: all .3s;
+  }
+  .member-card:hover {
+    background: rgba(200,150,12,0.07);
+    border-color: rgba(200,150,12,0.4);
+    transform: translateY(-3px);
+  }
+  .member-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--forest-light), var(--forest-mid));
+    border: 2.5px solid rgba(200,150,12,0.4);
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--gold-pale);
+  }
+  .member-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--white); margin-bottom: 4px;
+  }
+  .member-role {
+    font-size: 11.5px; font-weight: 500;
+    color: var(--gold); letter-spacing: 0.5px;
+    margin-bottom: 10px; text-transform: uppercase;
+  }
+  .member-bio { font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+  @media (max-width: 900px) {
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .team-grid { grid-template-columns: 1fr; }
+  }
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="background: var(--forest-deep);">
+  <div class="page-header-grid"></div>
+  <div class="page-header-content">
+    <div class="page-header-eyebrow">Membres & Équipe</div>
+    <h1>Le <em>bureau exécutif</em><br>et les piliers de l'association</h1>
+    <p class="page-header-desc">Des professionnels engagés au service de la communauté alumni.</p>
+  </div>
+</div>
+
+<section id="team-main">
+  <div class="team-grid">
+    <div class="member-card fade-up">
+      <div class="member-avatar">P.A</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Président(e)</div>
+      <div class="member-bio">Expert(e) en planification stratégique · Institution nationale</div>
+    </div>
+    <div class="member-card fade-up-1">
+      <div class="member-avatar">V.G</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Vice-Président(e)</div>
+      <div class="member-bio">Spécialiste suivi-évaluation · Projets de développement</div>
+    </div>
+    <div class="member-card fade-up-2">
+      <div class="member-avatar">S.G</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Secrétaire Général(e)</div>
+      <div class="member-bio">Économiste-planificateur · Secteur public</div>
+    </div>
+    <div class="member-card fade-up-3">
+      <div class="member-avatar">T.F</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Trésorier(ière)</div>
+      <div class="member-bio">Gestionnaire de finances publiques</div>
+    </div>
+    <div class="member-card fade-up">
+      <div class="member-avatar">R.C</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Chargé(e) des Programmes</div>
+      <div class="member-bio">Expert(e) en développement local · ONG internationale</div>
+    </div>
+    <div class="member-card fade-up-1">
+      <div class="member-avatar">C.C</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Communication</div>
+      <div class="member-bio">Spécialiste en communication institutionnelle</div>
+    </div>
+    <div class="member-card fade-up-2">
+      <div class="member-avatar">R.R</div>
+      <div class="member-name">Prénom Nom</div>
+      <div class="member-role">Relations Institutionnelles</div>
+      <div class="member-bio">Partenariats stratégiques · PTF</div>
+    </div>
+    <div class="member-card fade-up-3">
+      <div class="member-avatar">+</div>
+      <div class="member-name">120+ Alumni</div>
+      <div class="member-role">Réseau actif</div>
+      <div class="member-bio">À travers le Togo et la sous-région ouest-africaine</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

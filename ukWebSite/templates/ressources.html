@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Ressources & Publications — AAPSE-UK{% endblock %}
+{% block meta_description %}Accédez aux productions intellectuelles, guides pratiques et outils méthodologiques du réseau AAPSE-UK : alumni de planification et suivi-évaluation de l'Université de Kara.{% endblock %}
+
+{% block extra_styles %}
+  #resources-main { background: var(--white); }
+  .resources-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px; align-items: start;
+    margin-top: 60px;
+  }
+  .resource-list { list-style: none; }
+  .resource-item {
+    display: flex; gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none; color: inherit;
+  }
+  .resource-item:hover { padding-left: 8px; }
+  .resource-item:hover .resource-icon { background: var(--forest); color: var(--gold-pale); }
+  .resource-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: var(--gold-wash);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+  }
+  .resource-meta { flex: 1; }
+  .resource-type {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 5px;
+  }
+  .resource-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14.5px; font-weight: 700;
+    color: var(--forest-deep); line-height: 1.35;
+    margin-bottom: 5px;
+  }
+  .resource-desc { font-size: 12.5px; color: var(--ink-pale); line-height: 1.55; }
+  .resources-highlight {
+    background: var(--forest);
+    border-radius: 4px; padding: 40px;
+    color: var(--white);
+    position: sticky; top: 90px;
+  }
+  .resources-highlight h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--gold-pale); margin-bottom: 16px; line-height: 1.3;
+  }
+  .resources-highlight p {
+    font-size: 14.5px; color: rgba(255,255,255,0.7);
+    line-height: 1.75; margin-bottom: 28px;
+  }
+  .highlight-stat {
+    border-top: 1px solid rgba(200,150,12,0.25);
+    padding-top: 24px; margin-top: 24px;
+  }
+  .highlight-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px; font-weight: 700;
+    color: var(--gold); line-height: 1;
+  }
+  .highlight-stat-label {
+    font-size: 12px; color: rgba(255,255,255,0.5);
+    letter-spacing: 1px; text-transform: uppercase; margin-top: 6px;
+  }
+  @media (max-width: 900px) {
+    .resources-layout { grid-template-columns: 1fr; }
+    .resources-highlight { position: static; }
+  }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-grid"></div>
+  <div class="page-header-content">
+    <div class="page-header-eyebrow">Ressources & Publications</div>
+    <h1>Savoirs partagés,<br>pratiques <em>renforcées</em></h1>
+    <p class="page-header-desc">Accédez aux productions intellectuelles, guides pratiques et outils méthodologiques de notre réseau.</p>
+  </div>
+</div>
+
+<section id="resources-main">
+  <div class="resources-layout">
+    <ul class="resource-list">
+      <li>
+        <a class="resource-item" href="#">
+          <div class="resource-icon">📋</div>
+          <div class="resource-meta">
+            <div class="resource-type">Guide pratique</div>
+            <div class="resource-title">Intégrer le changement climatique dans les cadres logiques de projets</div>
+            <div class="resource-desc">Un guide opérationnel à destination des planificateurs et chefs de projets</div>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="resource-item" href="#">
+          <div class="resource-icon">📊</div>
+          <div class="resource-meta">
+            <div class="resource-type">Note de politique</div>
+            <div class="resource-title">Suivi-évaluation des ODD au Togo : état des lieux et recommandations</div>
+            <div class="resource-desc">Analyse des lacunes dans les systèmes nationaux de suivi des indicateurs ODD</div>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="resource-item" href="#">
+          <div class="resource-icon">🎓</div>
+          <div class="resource-meta">
+            <div class="resource-type">Travail de recherche</div>
+            <div class="resource-title">Efficacité des transferts conditionnels dans la région des Savanes</div>
+            <div class="resource-desc">Mémoire primé · Promotion 2023 · Université de Kara</div>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="resource-item" href="#">
+          <div class="resource-icon">🗂️</div>
+          <div class="resource-meta">
+            <div class="resource-type">Outil méthodologique</div>
+            <div class="resource-title">Template : Cadre de suivi-évaluation participatif pour collectivités locales</div>
+            <div class="resource-desc">Excel + notice d'utilisation, adapté au contexte togolais</div>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="resource-item" href="#">
+          <div class="resource-icon">🌍</div>
+          <div class="resource-meta">
+            <div class="resource-type">Rapport d'activités</div>
+            <div class="resource-title">Rapport annuel AAPSE-UK 2025</div>
+            <div class="resource-desc">Bilan de l'année : événements, publications, membres et partenariats</div>
+          </div>
+        </a>
+      </li>
+    </ul>
+    <div class="resources-highlight">
+      <h3>Bibliothèque collaborative des alumni</h3>
+      <p>
+        Les membres de l'AAPSE-UK bénéficient d'un accès privilégié à une bibliothèque de ressources constituée des meilleures productions académiques, notes politiques et outils méthodologiques issus des promotions successives.
+      </p>
+      <p>
+        Partagez votre expertise, enrichissez les pratiques collectives et laissez votre empreinte intellectuelle dans la communauté.
+      </p>
+      <a href="{% url 'contact' %}" class="btn-primary" style="font-size:13px; padding: 12px 24px;">Accéder à la bibliothèque</a>
+      <div class="highlight-stat">
+        <div class="highlight-stat-num">38</div>
+        <div class="highlight-stat-label">Documents disponibles</div>
+      </div>
+      <div class="highlight-stat">
+        <div class="highlight-stat-num">12</div>
+        <div class="highlight-stat-label">Publications académiques référencées</div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

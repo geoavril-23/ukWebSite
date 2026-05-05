@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact & Adhésion — AAPSE-UK{% endblock %}
+{% block meta_description %}Contactez l'AAPSE-UK, rejoignez le réseau des alumni en Planification et Suivi-Évaluation de l'Université de Kara et amplifiez votre impact.{% endblock %}
+
+{% block extra_styles %}
+  #contact-main { background: var(--cream); }
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 64px; align-items: start;
+    margin-top: 56px;
+  }
+  .contact-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--forest-deep); margin-bottom: 20px;
+  }
+  .contact-details { list-style: none; margin-bottom: 36px; }
+  .contact-details li {
+    display: flex; gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px; color: var(--ink-mid);
+    align-items: flex-start;
+  }
+  .contact-details .icon {
+    width: 20px; flex-shrink: 0;
+    color: var(--gold); font-size: 16px;
+    margin-top: 1px; text-align: center;
+  }
+  .membership-box {
+    background: var(--forest); color: var(--white);
+    padding: 28px; border-radius: 4px; margin-top: 8px;
+  }
+  .membership-box h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; color: var(--gold-pale); margin-bottom: 12px;
+  }
+  .membership-box p {
+    font-size: 13.5px; color: rgba(255,255,255,0.7);
+    line-height: 1.7; margin-bottom: 16px;
+  }
+  .membership-box .btn-primary { width: 100%; text-align: center; display: block; }
+  .form-panel {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 4px; padding: 40px;
+    box-shadow: var(--shadow-sm);
+  }
+  .form-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--forest-deep); margin-bottom: 8px;
+  }
+  .form-panel > p {
+    font-size: 13.5px; color: var(--ink-soft);
+    margin-bottom: 28px; line-height: 1.6;
+  }
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 16px;
+  }
+  .form-group { margin-bottom: 16px; }
+  label {
+    display: block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--forest); margin-bottom: 7px;
+  }
+  input, select, textarea {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid rgba(27,77,46,0.2);
+    border-radius: 3px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px; color: var(--ink);
+    background: var(--cream);
+    transition: border-color .2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--forest); background: var(--white);
+  }
+  textarea { resize: vertical; min-height: 100px; }
+  select { cursor: pointer; }
+  .form-submit {
+    width: 100%;
+    background: var(--forest); color: var(--white);
+    border: none; cursor: pointer;
+    padding: 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 3px; margin-top: 8px;
+    transition: all .2s;
+  }
+  .form-submit:hover { background: var(--gold); color: var(--forest-deep); }
+  @media (max-width: 900px) {
+    .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-grid"></div>
+  <div class="page-header-content">
+    <div class="page-header-eyebrow">Contact & Adhésion</div>
+    <h1>Rejoignez le réseau,<br><em>amplifiez votre impact</em></h1>
+    <p class="page-header-desc">Une question, une proposition de collaboration, ou prêt(e) à intégrer la communauté ? Écrivez-nous.</p>
+  </div>
+</div>
+
+<section id="contact-main">
+  <div class="contact-layout">
+    <div class="contact-info fade-up">
+      <h3>Nos coordonnées</h3>
+      <ul class="contact-details">
+        <li>
+          <span class="icon">📍</span>
+          <span>Université de Kara, Togo<br><small style="color:var(--ink-pale)">Siège social de l'association</small></span>
+        </li>
+        <li>
+          <span class="icon">✉️</span>
+          <span>contact@aapse-uk.org<br><small style="color:var(--ink-pale)">Réponse sous 48h ouvrées</small></span>
+        </li>
+        <li>
+          <span class="icon">📱</span>
+          <span>+228 XX XX XX XX<br><small style="color:var(--ink-pale)">Secrétariat général</small></span>
+        </li>
+        <li>
+          <span class="icon">🌐</span>
+          <span>www.aapse-uk.org<br><small style="color:var(--ink-pale)">Site officiel</small></span>
+        </li>
+      </ul>
+      <div class="membership-box">
+        <h4>Adhésion 2026</h4>
+        <p>
+          Rejoignez l'association pour accéder à tous les événements, à la bibliothèque collaborative et au réseau de 120+ alumni actifs dans les institutions publiques et organisations de développement.
+        </p>
+        <a href="#contact-form" class="btn-primary">Compléter ma demande d'adhésion</a>
+      </div>
+    </div>
+    <div class="form-panel fade-up-1" id="contact-form">
+      <h3>Nous écrire</h3>
+      <p>Remplissez ce formulaire et l'équipe vous répondra dans les meilleurs délais.</p>
+      
+      {% if messages %}
+        {% for message in messages %}
+          <div style="padding: 15px; margin-bottom: 20px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prenom">Prénom *</label>
+            <input id="prenom" type="text" name="prenom" placeholder="Votre prénom" required>
+          </div>
+          <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input id="nom" type="text" name="nom" placeholder="Votre nom" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Adresse e-mail *</label>
+            <input id="email" type="email" name="email" placeholder="vous@exemple.com" required>
+          </div>
+          <div class="form-group">
+            <label for="telephone">Téléphone (WhatsApp) *</label>
+            <input id="telephone" type="tel" name="telephone" placeholder="+228 00 00 00 00" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="institution">Institution / Organisation</label>
+          <input id="institution" type="text" name="institution" placeholder="Votre employeur actuel">
+        </div>
+        <div class="form-group">
+          <label for="promotion">Promotion (si alumni UK)</label>
+          <select id="promotion" name="promotion">
+            <option value="">-- Sélectionner --</option>
+            <option value="2019">Promotion 2019</option>
+            <option value="2020">Promotion 2020</option>
+            <option value="2021">Promotion 2021</option>
+            <option value="2022">Promotion 2022</option>
+            <option value="2023">Promotion 2023</option>
+            <option value="2024">Promotion 2024</option>
+            <option value="0">Je ne suis pas alumni UK</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sujet">Objet de votre message *</label>
+          <select id="sujet" name="sujet" required>
+            <option value="">-- Sélectionner --</option>
+            <option value="adhesion">Adhésion</option>
+            <option value="partenariat">Partenariat / Collaboration</option>
+            <option value="ressources">Ressources / Publications</option>
+            <option value="share">Événement Share To Us</option>
+            <option value="autre">Autre demande</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" placeholder="Décrivez votre demande ou votre message…" required></textarea>
+        </div>
+        <button class="form-submit" type="submit" id="submitBtn">Envoyer le message</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}

@@ -1,0 +1,116 @@
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand-logo">
+        <div class="footer-logo-mark">AK</div>
+        <div class="footer-brand-name">AAPSE-UK</div>
+      </div>
+      <p class="footer-desc">
+        Association des Alumni en Planification et Suivi-Évaluation de l'Université de Kara. Réseau de professionnels au service du développement durable du Togo et de l'Afrique de l'Ouest.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h5>Navigation</h5>
+      <ul class="footer-links">
+        <li><a href="{% url 'about' %}">À propos</a></li>
+        <li><a href="{% url 'actualites' %}">Actualités</a></li>
+        <li><a href="{% url 'members' %}">Membres</a></li>
+        <li><a href="{% url 'ressources' %}">Ressources</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Activités</h5>
+      <ul class="footer-links">
+        <li><a href="{% url 'actualites' %}">Share To Us — Éd. 1</a></li>
+        <li><a href="#">Groupes de travail</a></li>
+        <li><a href="#">Mentorat</a></li>
+        <li><a href="{% url 'ressources' %}">Bibliothèque</a></li>
+        <li><a href="#">Partenariats</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Liens utiles</h5>
+      <ul class="footer-links">
+        <li><a href="#">Université de Kara</a></li>
+        <li><a href="#">Ministère de la Planification</a></li>
+        <li><a href="#">PNUD Togo</a></li>
+        <li><a href="#">Statuts de l'association</a></li>
+        <li><a href="#">Politique de confidentialité</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 AAPSE-UK · Tous droits réservés · Kara, Togo</div>
+    <div class="footer-gold-line">« Planifier aujourd'hui pour bâtir demain »</div>
+  </div>
+</footer>
+
+<style>
+  footer {
+    background: #080F0A;
+    color: rgba(255,255,255,0.55);
+    padding: 60px 5% 32px;
+    border-top: 1px solid rgba(200,150,12,0.2);
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px; margin-bottom: 48px;
+  }
+  .footer-brand-logo {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .footer-logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 13px;
+    color: var(--forest-deep);
+  }
+  .footer-brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600;
+    color: rgba(255,255,255,0.85);
+  }
+  .footer-desc {
+    font-size: 13px; line-height: 1.75;
+    color: rgba(255,255,255,0.42);
+    margin-bottom: 20px;
+  }
+  .footer-col h5 {
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 1.8px; text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 10px; }
+  .footer-links a {
+    color: rgba(255,255,255,0.45);
+    text-decoration: none; font-size: 13px;
+    transition: color .2s;
+  }
+  .footer-links a:hover { color: var(--gold-pale); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding-top: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.28); }
+  .footer-gold-line {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px; font-style: italic;
+    color: rgba(200,150,12,0.55);
+  }
+  @media (max-width: 900px) {
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
+  }
+  @media (max-width: 600px) {
+    .footer-top { grid-template-columns: 1fr; }
+  }
+</style>

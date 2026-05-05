@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}AAPSE-UK Dashboard{% endblock %}</title>
+
+<!-- Custom fonts for this template-->
+    <link href="{% static 'dashboard/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'dashboard/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    
+    <style>
+        /* Animations notifications */
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0.3; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .notification-badge { animation: bounce 0.5s infinite alternate; font-size: 0.7em; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+        .animate-blink { animation: blink 1s infinite !important; }
+        .animate-pulse { animation: pulse 2s infinite !important; }
+
+        /* Styles pour le Mode Sombre */
+        body.dark-mode {
+            background-color: #1a202c !important;
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode #content-wrapper {
+            background-color: #1a202c !important;
+        }
+        body.dark-mode .card {
+            background-color: #2d3748 !important;
+            color: #e2e8f0 !important;
+            border-color: #4a5568 !important;
+        }
+        body.dark-mode .navbar, body.dark-mode footer {
+            background-color: #2d3748 !important;
+            border-bottom: 1px solid #4a5568 !important;
+        }
+        body.dark-mode .text-gray-800, body.dark-mode .h3, body.dark-mode h1, body.dark-mode h6 {
+            color: #f7fafc !important;
+        }
+        body.dark-mode .table {
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode .sidebar {
+            background-color: #171923 !important;
+        }
+        /* Style du bouton toggle */
+        .theme-toggle {
+            cursor: pointer;
+            padding: 0 15px;
+            font-size: 1.2rem;
+            color: #4e73df;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+{% include 'dashboard/partials/sidebar.html' %}
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+{% include 'dashboard/partials/nav.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    {% block content %}{% endblock %}
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+{% include 'dashboard/partials/footer.html' %}
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Prêt à partir ?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Sélectionnez "Déconnexion" ci-dessous si vous êtes prêt à terminer votre session actuelle.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+<a class="btn btn-primary" href="{% url 'user_logout' %}">Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Bootstrap core JavaScript-->
+    <script src="{% static 'dashboard/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'dashboard/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'dashboard/js/sb-admin-2.min.js' %}"></script>
+
+    <!-- Notification tracking -->
+    <input type="hidden" id="lastCount" value="0" style="display:none;">
+
+    <script>
+        // Auto-suppression des alertes après 5 secondes + NOTIFS REALTIME
+        $(document).ready(function() {
+            setTimeout(function() {
+                $(".alert").fadeOut('slow');
+            }, 5000);
+
+            // NOTIFICATIONS LIVE (Manager only)
+            function checkNotifications() {
+$.get('/dashboard/api/pending-count/')
+                    .done(function(data) {
+                        const count = data.count;
+                        $('#pendingCount, #sidebarCount').text(count);
+                        $('#pendingBadge, #sidebarBadge').text(count > 99 ? '99+' : count).toggle(count > 0);
+                        
+                        if (count > parseInt($('#lastCount').val() || 0)) {
+                            // Nouveau message ! Son + blink
+                            playNotificationSound();
+                            $('#notificationIcon, #sidebarNotification').addClass('animate-blink');
+                        }
+                        $('#lastCount').val(count);
+                    });
+            }
+
+            // Poll 10s
+            setInterval(checkNotifications, 10000);
+            checkNotifications(); // Initial
+        });
+
+        // Son notification beep
+        function playNotificationSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Gestion du Mode Sombre
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const icon = themeToggle ? themeToggle.querySelector('i') : null;
+
+        // Vérifier si une préférence est déjà enregistrée
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            if (icon) icon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                    if (icon) icon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    if (icon) icon.classList.replace('fa-sun', 'fa-moon');
+                }
+            });
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>
