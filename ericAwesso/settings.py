@@ -87,11 +87,14 @@ WSGI_APPLICATION = 'ericAwesso.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Sur Vercel, la variable peut s'appeler 'DATABASE_URL' ou 'postgres_DATABASE_URL'
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('postgres_DATABASE_URL')
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
+        default=db_url,
         conn_max_age=600,
-        ssl_require=True if os.environ.get('DATABASE_URL', '').startswith('postgres://') and not 'localhost' in os.environ.get('DATABASE_URL', '') else False
+        ssl_require=True if db_url and 'localhost' not in db_url else False
     )
 }
 
