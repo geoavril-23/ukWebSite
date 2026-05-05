@@ -135,7 +135,17 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Dossiers où Django va chercher les fichiers statiques en plus de ceux des apps
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'ukWebSite/static'),
+    os.path.join(BASE_DIR, 'ukWebSite/templates/dashboard/static'),
+]
+
+# Optimisation WhiteNoise pour la production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
 
 # Media files (uploaded by users: photos, documents…)
 MEDIA_URL  = '/media/'
