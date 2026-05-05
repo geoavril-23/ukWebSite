@@ -143,9 +143,8 @@ STATICFILES_DIRS = [
 ]
 
 # Optimisation WhiteNoise pour la production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 WHITENOISE_USE_FINDERS = True
-WHITENOISE_MANIFEST_STRICT = False
 
 # Media files (uploaded by users: photos, documents…)
 MEDIA_URL  = '/media/'
