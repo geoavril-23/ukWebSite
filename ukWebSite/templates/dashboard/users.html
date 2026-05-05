@@ -916,7 +916,7 @@ $(document).ready(function () {
         var role   = $(this).data('role');
         var label  = role === 'manager' ? 'Manager' : 'Visiteur';
         if (confirm('Changer le rôle vers ' + label + ' ?')) {
-            $.get('/dashboard/users/change-role/' + userId + '/?role=' + role, function (data) {
+            $.get('/dashboard/users/role/' + userId + '/?role=' + role, function (data) {
                 if (data.status === 'success') location.reload();
                 else alert('Erreur : ' + data.message);
             });
