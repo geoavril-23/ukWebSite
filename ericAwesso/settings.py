@@ -33,11 +33,12 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 # Origines de confiance pour la protection CSRF
-# Nécessaire pour accéder depuis un téléphone ou un autre appareil sur le réseau local
+# Nécessaire pour accéder depuis Vercel ou un autre appareil sur le réseau local
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://192.168.1.67:8000',  # Adresse IP locale du PC sur le réseau Wi-Fi
+    'https://*.vercel.app',       # Permet les domaines Vercel
 ]
 
 # Application definition
