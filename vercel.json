@@ -2,11 +2,19 @@
     "version": 2,
     "builds": [
         {
+            "src": "build_files.sh",
+            "use": "@vercel/python"
+        },
+        {
             "src": "ericAwesso/wsgi.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
+        {
+            "src": "/static/(.*)",
+            "dest": "/static/$1"
+        },
         {
             "src": "/(.*)",
             "dest": "ericAwesso/wsgi.py"
