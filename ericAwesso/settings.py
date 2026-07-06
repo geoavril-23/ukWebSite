@@ -28,17 +28,15 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-!jmun51d==-9ao=z$#53r=qcchuo30#&uah566^4@m75a%1wx_')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 # Origines de confiance pour la protection CSRF
 # Nécessaire pour accéder depuis Vercel ou un autre appareil sur le réseau local
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
-    'http://192.168.1.67:8000',  # Adresse IP locale du PC sur le réseau Wi-Fi
-    'https://*.vercel.app',       # Permet les domaines Vercel
 ]
 
 # Application definition
@@ -87,16 +85,21 @@ WSGI_APPLICATION = 'ericAwesso.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Sur Vercel, la variable peut s'appeler 'DATABASE_URL' ou 'postgres_DATABASE_URL'
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('postgres_DATABASE_URL')
-
 DATABASES = {
-    'default': dj_database_url.config(
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Utiliser dj_database_url seulement si DATABASE_URL est présent (pour compatibilité)
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('postgres_DATABASE_URL')
+if db_url and not 'localhost' in db_url:
+    DATABASES['default'] = dj_database_url.config(
         default=db_url,
         conn_max_age=600,
-        ssl_require=True if db_url and 'localhost' not in db_url else False
+        ssl_require=True
     )
-}
 
 
 # Password validation
